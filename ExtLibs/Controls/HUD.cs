@@ -26,6 +26,7 @@ using SkiaSharp.Views.Desktop;
 using SkiaSharp;
 
 
+
 // Control written by Michael Oborne 2011
 // dual opengl and GDI+
 
@@ -127,7 +128,6 @@ namespace MissionPlanner.Controls
 
         private object paintlock = new object();
         private object streamlock = new object();
-
         private MemoryStream _streamjpg = new MemoryStream();
 
         [System.ComponentModel.Browsable(false)]
@@ -1180,11 +1180,12 @@ namespace MissionPlanner.Controls
         public event EventHandler ekfclick;
         public event EventHandler vibeclick;
         public event EventHandler prearmclick;
+        public event EventHandler batteryclick;
 
         Rectangle ekfhitzone = new Rectangle();
         Rectangle vibehitzone = new Rectangle();
         Rectangle prearmhitzone = new Rectangle();
-
+        Rectangle batteryhitzone = new Rectangle();
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
@@ -1206,6 +1207,14 @@ namespace MissionPlanner.Controls
                 if (prearmclick != null)
                     prearmclick(this, null);
             }
+
+            if (batteryhitzone.IntersectsWith(new Rectangle(e.X, e.Y, 5, 5)))
+            {
+                // 1. 이벤트가 선언되어 있는지 확인 (클래스 상단: public event EventHandler batteryclick;)
+                if (batteryclick != null)
+                    batteryclick(this, null); // 여기서 신호를 쏴야 함!
+                               
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -1221,6 +1230,11 @@ namespace MissionPlanner.Controls
                 Cursor.Current = Cursors.Hand;
             }
             else if (prearmhitzone.IntersectsWith(new Rectangle(e.X, e.Y, 5, 5)) && !status) // Only when not armed
+            {
+                Cursor.Current = Cursors.Hand;
+            }
+            // 배터리 영역에 마우스가 올라가면 손가락 모양으로 변경
+            else if (batteryhitzone.IntersectsWith(new Rectangle(e.X, e.Y, 5, 5)))
             {
                 Cursor.Current = Cursors.Hand;
             }
@@ -2885,7 +2899,7 @@ namespace MissionPlanner.Controls
                         text = HUDT.Bat + "1 " + _batterylevel.ToString("0.00v") + " " + _current.ToString("0.0 A") + " " + (_batteryremaining) + "%";
                         
                         drawstring(text, font, fontsize, textcolor, xPos, yPos[textIdx]);
-
+                        batteryhitzone = new Rectangle((int)xPos, (int)yPos[textIdx], 120, fontsize + 10);
 
                     }
                 }
@@ -3213,6 +3227,7 @@ namespace MissionPlanner.Controls
                         }
                     }
                 }
+
 
                 if (displayprearm && status == false) // not armed
                 {

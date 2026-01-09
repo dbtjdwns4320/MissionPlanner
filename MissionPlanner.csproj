@@ -696,6 +696,7 @@
     <Content Include="quaternion.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\splashdark.jpg" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1183,6 +1184,9 @@
     <Compile Remove="wix\Properties\AssemblyInfo.cs" />
     <Compile Remove="ZZZLibShims.cs" />
 
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\splashdark.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SikRadio\ISikRadioForm.cs" />

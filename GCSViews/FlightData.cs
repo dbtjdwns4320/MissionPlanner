@@ -3294,6 +3294,18 @@ namespace MissionPlanner.GCSViews
             frm.TopMost = true;
             frm.Show();
         }
+        private void hud1_batteryclick(object sender, EventArgs e)
+        {
+            //배터리 상태 배너 뛰우기
+            BatteryStatus frm = new BatteryStatus();
+            frm.RestoreStartupLocation(); 
+            frm.WindowState = FormWindowState.Normal;
+            frm.FormClosed += (a, e2) => frm.SaveStartupLocation();
+            frm.TopMost = true;
+            frm.Show();
+        }
+
+
 
         /// <summary>
         /// <para>Collapses or expands MainH.Panel1 depending on no. of controls within.</para>
