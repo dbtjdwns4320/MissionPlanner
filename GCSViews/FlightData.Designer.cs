@@ -746,13 +746,13 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
             this.tableLayoutPanel1.Controls.Add(this.BUT_SendMSG, 2, 4);
             this.tableLayoutPanel1.Controls.Add(this.BUT_abortland, 4, 4);
-            this.tableLayoutPanel1.Controls.Add(this.modifyandSetLoiterRad, 4, 2);
+            this.tableLayoutPanel1.Controls.Add(this.modifyandSetLoiterRad, 4, 2); // 4, 2
             this.tableLayoutPanel1.Controls.Add(this.BUT_clear_track, 4, 3);
             this.tableLayoutPanel1.Controls.Add(this.CMB_action, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.BUTactiondo, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.BUT_resumemis, 3, 4);
-            this.tableLayoutPanel1.Controls.Add(this.modifyandSetAlt, 4, 1);
-            this.tableLayoutPanel1.Controls.Add(this.modifyandSetSpeed, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.modifyandSetAlt, 4, 1); // 4, 1
+            this.tableLayoutPanel1.Controls.Add(this.modifyandSetSpeed, 4, 0); // 4, 0
             this.tableLayoutPanel1.Controls.Add(this.CMB_setwp, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.BUT_ARM, 3, 3);
             this.tableLayoutPanel1.Controls.Add(this.BUT_mountmode, 1, 3);
@@ -768,6 +768,60 @@ namespace MissionPlanner.GCSViews
             this.tableLayoutPanel1.Controls.Add(this.BUT_quickauto, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.BUT_setmode, 1, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.AutoSize = true;
+            this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+
+            // 1. 레이아웃 판 자체의 자동 확장 기능을 완전히 끕니다.
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.None;
+            this.tableLayoutPanel1.AutoSize = true;
+            this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+
+            // 2. 열(Column) 설정: 특정 칸만 더 넓게 잡기
+            this.tableLayoutPanel1.ColumnStyles.Clear();
+            for (int i = 0; i < this.tableLayoutPanel1.ColumnCount; i++)
+            {
+                if (i == 4) // 5번째 열 (Change Speed, 기록 삭제 등이 있는 곳)
+                {
+                    this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 220f));
+                }
+                else
+                {
+                    this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 70f));
+                }
+            }
+
+            // 3. 내부 박스 크기 설정
+            foreach (System.Windows.Forms.Control ctrl in this.tableLayoutPanel1.Controls)
+            {
+                ctrl.AutoSize = false;
+                int column = this.tableLayoutPanel1.GetColumn(ctrl);
+
+                if (column == 4)
+                {
+                    ctrl.Size = new System.Drawing.Size(210, 32);
+                    ctrl.MinimumSize = new System.Drawing.Size(210, 32);
+
+                }
+                else
+                {
+                    ctrl.Size = new System.Drawing.Size(65, 32);
+                }
+
+                //ctrl.Dock = System.Windows.Forms.DockStyle.None;
+                ctrl.Anchor = System.Windows.Forms.AnchorStyles.Left;
+                ctrl.Margin = new System.Windows.Forms.Padding(1);
+
+                // 4. 글자 위치를 가운데로 (버튼일 경우)
+                if (ctrl is System.Windows.Forms.Button btn)
+                {
+                    btn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+                }
+
+            }
+
+
+
+
             // 
             // BUT_SendMSG
             // 

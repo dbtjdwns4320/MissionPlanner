@@ -8,8 +8,9 @@ namespace MissionPlanner.Controls
     {
         public EKFStatus()
         {
+            this.TopMost = true;
             InitializeComponent();
-
+            
             Utilities.ThemeManager.ApplyThemeTo(this);
 
             timer1.Start();

@@ -7,8 +7,9 @@ namespace MissionPlanner.Controls
     {
         public Vibration()
         {
+            this.TopMost = true;
             InitializeComponent();
-
+            
             Utilities.ThemeManager.ApplyThemeTo(this);
 
             timer1.Start();

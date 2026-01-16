@@ -1,55 +1,130 @@
 ﻿using System;
-using System.Drawing;      // <-- Color, Point, Font, Size를 쓰기 위해 필수!
-using System.Windows.Forms; // <-- Label, Timer, Form을 쓰기 위해 필수!
-using MissionPlanner;      // <-- MainV2 데이터를 가져오기 위해 필수!
+using System.Drawing;
+using System.Windows.Forms;
+using MissionPlanner;
 
 namespace MissionPlanner.Controls
 {
     public partial class BatteryStatus : Form
     {
+        Label lblBattTitle = new Label();
         Label lblVolt = new Label();
         Label lblCurrent = new Label();
         Label lblSpeed = new Label();
-        // 1. 데이터를 갱신할 타이머 선언
+        PictureBox pbBattery = new PictureBox(); // 배터리 그림통
         Timer updateTimer = new Timer();
+        Label lblBattPercent = new Label();
 
         public BatteryStatus()
         {
-            InitializeComponent();
-            SetupLabels();
-            // 2. 타이머 설정 (0.5초마다 갱신)
+            // 기본 창 설정
+            this.Size = new Size(350, 250);
+            this.Text = "Battery & Speed Status";
+            this.BackColor = Color.Black;
+            this.TopMost = true;
+
+            SetupControls();
+
             updateTimer.Interval = 500;
             updateTimer.Tick += UpdateTimer_Tick;
             updateTimer.Start();
 
-            // 창이 닫힐 때 타이머도 멈추도록 설정
             this.FormClosing += (s, e) => updateTimer.Stop();
         }
-        private void SetupLabels()
+
+
+
+        private void SetupControls()
         {
-            // 배경을 검정으로, 글자를 형광색으로 하면 HUD 느낌이 납니다.
-            this.BackColor = Color.Black;
+            this.Size = new Size(450, 280);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.BackColor = Color.FromArgb(30, 30, 30);
 
-            // 전압 라벨 설정
-            lblVolt.Location = new Point(20, 20);
-            lblVolt.Size = new Size(250, 40);
-            lblVolt.Font = new Font("Consolas", 16, FontStyle.Bold);
-            lblVolt.ForeColor = Color.Lime;
-            this.Controls.Add(lblVolt); // 창에 추가
+            // 배터리 뭉치 기준 X 좌표
+            int batteryX = 280;
+            int batteryWidth = 100;
 
-            // 전류 라벨 설정
-            lblCurrent.Location = new Point(20, 70);
-            lblCurrent.Size = new Size(250, 40);
-            lblCurrent.Font = new Font("Consolas", 16, FontStyle.Bold);
-            lblCurrent.ForeColor = Color.Lime;
+            // 1. "잔여배터리" 제목 (크기 줄임 + 맨 앞으로 가져오기)
+            lblBattTitle.Text = "잔여배터리";
+            lblBattTitle.Location = new Point(batteryX, 20); // Y좌표 살짝 위로
+            lblBattTitle.Size = new Size(batteryWidth, 25);
+            lblBattTitle.Font = new Font("맑은 고딕", 10, FontStyle.Bold); // 11 -> 10으로 축소
+            lblBattTitle.ForeColor = Color.White;
+            lblBattTitle.BackColor = Color.Transparent; // 배경 투명
+            lblBattTitle.TextAlign = ContentAlignment.MiddleCenter;
+
+            if (!this.Controls.Contains(lblBattTitle)) this.Controls.Add(lblBattTitle);
+            lblBattTitle.BringToFront(); // [핵심] 그림 뒤로 숨지 않게 설정
+
+            // 2. 배터리 도화지
+            pbBattery.Location = new Point(batteryX, 50);
+            pbBattery.Size = new Size(batteryWidth, 130);
+            pbBattery.BackColor = Color.Transparent;
+
+            pbBattery.Paint -= PbBattery_Paint;
+            pbBattery.Paint += PbBattery_Paint;
+
+            if (!this.Controls.Contains(pbBattery)) this.Controls.Add(pbBattery);
+
+            // 3. 배터리 퍼센트 %
+            lblBattPercent.Location = new Point(batteryX, 185);
+            lblBattPercent.Size = new Size(batteryWidth, 35);
+            lblBattPercent.Font = new Font("Consolas", 18, FontStyle.Bold);
+            lblBattPercent.BackColor = Color.Transparent;
+            lblBattPercent.TextAlign = ContentAlignment.MiddleCenter;
+
+            if (!this.Controls.Contains(lblBattPercent)) this.Controls.Add(lblBattPercent);
+            lblBattPercent.BringToFront();
+
+            // 4. 왼쪽 텍스트 그룹 (배터리와 더 가깝게 너비 조정)
+            Font hanguFont = new Font("맑은 고딕", 17, FontStyle.Bold);
+
+            lblVolt.Location = new Point(20, 45);
+            lblVolt.Size = new Size(250, 35);
+            lblVolt.Font = hanguFont;
+            this.Controls.Add(lblVolt);
+
+            lblCurrent.Location = new Point(20, 80);
+            lblCurrent.Size = new Size(250, 35);
+            lblCurrent.Font = hanguFont;
             this.Controls.Add(lblCurrent);
 
-            // 속도 라벨 설정
-            lblSpeed.Location = new Point(20, 120);
-            lblSpeed.Size = new Size(300, 40);
-            lblSpeed.Font = new Font("Consolas", 16, FontStyle.Bold);
-            lblSpeed.ForeColor = Color.Aqua; // 속도는 하늘색으로 구분
+            lblSpeed.Location = new Point(20, 145);
+            lblSpeed.Size = new Size(250, 80);
+            lblSpeed.Font = new Font("맑은 고딕", 15, FontStyle.Bold);
             this.Controls.Add(lblSpeed);
+        }
+
+        private void PbBattery_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            // 하얀색 외곽선 (Pen 두께 4)
+            using (Pen whitePen = new Pen(Color.White, 4))
+            {
+                // 도화지 너비 100 기준 중앙 배치 (X=20)
+                g.DrawRectangle(whitePen, 20, 25, 60, 100);
+                // 단자 중앙 배치 (X=35)
+                g.DrawRectangle(whitePen, 35, 5, 30, 18);
+            }
+
+            // 내부 채우기 (데이터 연동)
+            var cs = MainV2.comPort.MAV.cs;
+            double remaining = (cs != null) ? cs.battery_remaining : 0;
+
+            Color fillColor = (remaining <= 20) ? Color.Red : (remaining <= 50 ? Color.Orange : Color.Lime);
+            int fillHeight = (int)(92 * (Math.Max(2, remaining) / 100.0));
+
+            if (fillHeight > 0)
+            {
+                // 몸체 내부(X=24, 너비 53)에 맞춰 채우기
+                int yPos = 121 - fillHeight;
+                using (SolidBrush brush = new SolidBrush(fillColor))
+                {
+                    g.FillRectangle(brush, 24, yPos, 53, fillHeight);
+                }
+            }
         }
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
@@ -57,18 +132,25 @@ namespace MissionPlanner.Controls
             var cs = MainV2.comPort.MAV.cs;
             if (cs == null) return;
 
-            // 데이터 가져오기
-            double volt = cs.battery_voltage;
-            double current = cs.current;
-            int remaining = cs.battery_remaining;
-            float aspeed = cs.airspeed;
-            float gspeed = cs.groundspeed;
+            double remaining = cs.battery_remaining;
 
-            // 창 안의 라벨들에 값 넣기 (\n은 줄바꿈입니다)
-            lblVolt.Text = $"Voltage: {volt:0.00} V";
-            lblCurrent.Text = $"Current: {current:0.0} A ({remaining}%)";
-            lblSpeed.Text = $"AS: {aspeed:0.0} | GS: {gspeed:0.0} m/s";
-            this.Text = "갱신 중: " + DateTime.Now.ToString("HH:mm:ss");
+            // 텍스트 업데이트
+            lblVolt.Text = $"전압: {cs.battery_voltage:F2} V";
+            lblCurrent.Text = $"전류: {cs.current:F1} A";
+            lblBattPercent.Text = $"{(int)remaining}%";
+            lblSpeed.Text = $"대기속도: {cs.airspeed:F1} m/s\n지면속도: {cs.groundspeed:F1} m/s";
+
+            // 색상 강제 고정 (매 틱마다 다시 설정)
+            lblVolt.ForeColor = Color.Lime;
+            lblCurrent.ForeColor = Color.Lime;
+            lblSpeed.ForeColor = Color.Cyan;
+
+            // 퍼센트 색상 고정 (흰색 방지)
+            if (remaining <= 25) lblBattPercent.ForeColor = Color.Red;
+            else if (remaining <= 50) lblBattPercent.ForeColor = Color.Orange;
+            else lblBattPercent.ForeColor = Color.White; // 기본은 흰색, 필요시 Color.Lime 등으로 변경 가능
+
+            pbBattery.Invalidate(); // 그림 새로고침
         }
     }
 }

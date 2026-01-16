@@ -263,6 +263,7 @@ namespace MissionPlanner.GCSViews
             // populate the unmodified base list
             tabControlactions.TabPages.ForEach(i => { TabListOriginal.Add((TabPage) i); });
 
+
             //  mymap.Manager.UseMemoryCache = false;
 
             log.Info("Tunning Graph Settings");
@@ -422,7 +423,35 @@ namespace MissionPlanner.GCSViews
 
             tabControlactions.Multiline = Settings.Instance.GetBoolean("tabControlactions_Multiline", false);
 
+            // 1. 탭 크기 및 모드 설정 (너비를 넓히기 위해 필요)
+            this.tabControlactions.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.tabControlactions.ItemSize = new System.Drawing.Size(120, 40); // 탭 넓이 120, 높이 40
+
+            // 1. 전체 탭 제목(머리말) 크기 설정
+            this.tabControlactions.Font = new System.Drawing.Font("맑은 고딕", 11F, System.Drawing.FontStyle.Bold);
+
+            // 2. 각 탭 페이지별로 내부 상속 폰트를 다르게 지정
+            foreach (System.Windows.Forms.TabPage page in this.tabControlactions.TabPages)
+            {
+                // A. 명령 탭 (tabActions) 내부 -> 9pt 상속
+                if (page.Name == "tabActions")
+                {
+                    page.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+                }
+                // B. 그 외 나머지 모든 탭 (개요, 메시지 등) 내부 -> 8pt 상속
+                else
+                {
+                    page.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
+                }
+            }
+
+            // 3. 탭 제목 영역 크기 조절 (글자가 커졌으므로 필수)
+            this.tabControlactions.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.tabControlactions.ItemSize = new System.Drawing.Size(130, 40);
+
+
         }
+
 
         public void Activate()
         {

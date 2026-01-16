@@ -10,7 +10,9 @@ using MissionPlanner.Controls;
 using MissionPlanner.GCSViews.ConfigurationView;
 using MissionPlanner.Log;
 using MissionPlanner.Maps;
+using MissionPlanner.GCSViews;
 using MissionPlanner.Utilities;
+
 
 using MissionPlanner.Warnings;
 using SkiaSharp;
@@ -1082,6 +1084,14 @@ namespace MissionPlanner
                 MenuArduPilot.Image = Program.Logo2;
 
             Application.DoEvents();
+            DateTime waitStart = DateTime.Now;
+            while ((DateTime.Now - waitStart).TotalSeconds < 5)
+            {
+                // 중요: 이 코드가 있어야 대기하는 5초 동안 윈도우가 
+                // "응답 없음"으로 빠지지 않고 스플래시 화면을 유지합니다.
+                Application.DoEvents();
+                System.Threading.Thread.Sleep(100); // CPU 점유율을 낮추기 위한 미세 대기
+            }
 
             Comports.Add(comPort);
 
@@ -1089,6 +1099,27 @@ namespace MissionPlanner
 
             // save config to test we have write access
             SaveConfig();
+
+
+            try
+            {
+                var frmBat = new MissionPlanner.Controls.BatteryStatus();
+                frmBat.Show();
+
+                var frmEkf = new MissionPlanner.Controls.EKFStatus();
+                frmEkf.Show();
+
+                var frmVibe = new MissionPlanner.Controls.Vibration();
+                frmVibe.Show();
+
+                frmBat.Location = new Point(50, 150);
+                frmEkf.Location = new Point(frmBat.Right + 10, 150);
+                frmVibe.Location = new Point(frmEkf.Right + 10, 150);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("자동 팝업 오류: " + ex.Message);
+            }
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)
